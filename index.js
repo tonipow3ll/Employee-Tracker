@@ -1,21 +1,63 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
+const { allowedNodeEnvironmentFlags } = require('process');
 
 const connection = mysql.createConnection({
   host: 'localhost',
 
-  // Your port; if not 3306
+ 
   port: 3306,
 
-  // Your username
+
   user: 'root',
 
-  // Be sure to update with your own MySQL password!
+
   password: 'Bonniethedog',
-  database: 'top_songsDB1',
+  database: 'EmployeeTracker_DB',
 });
 
 connection.connect((err) => {
     if (err) throw err;
-    // func to start the app here
+    initApp()
   });
+
+  initApp = () => {
+    inquirer
+      .prompt([
+        {
+          type: 'list',
+          name: 'directory',
+          message: 'What would you like to do?',
+          choices: [
+              'View all employees',
+              'Add employee',
+              'Add department',
+              'Add role',
+              'Update information',
+              'View all departments'
+          ]
+        }
+    ])
+    .then((answers) => {
+        switch (answers.directory){
+            case 'View all employees':
+                allEmployees();
+                break;
+            case 'Add employee':
+                addEmployee();
+                break;
+            case 'Add department':
+                addDept();
+                break;
+            case 'Add role':
+                addRole();
+                break;
+            case 'Update information':
+                updateInfo();
+                break;
+            case 'View all departments':
+                allDepts();
+                break;
+        }
+    })
+}
