@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-const { allowedNodeEnvironmentFlags } = require('process');
+const Employee = require("./lib/employee");
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -34,7 +34,8 @@ connection.connect((err) => {
               'Add department',
               'Add role',
               'Update information',
-              'View all departments'
+              'View all departments',
+              'Exit'
           ]
         }
     ])
@@ -58,6 +59,37 @@ connection.connect((err) => {
             case 'View all departments':
                 allDepts();
                 break;
+            case 'Exit':
+                connection.end(console.log("Exiting application, goodbye"));
+                break;
         }
     })
+
+    // const allEmployees = () =>{
+    //    const query = 'SELECT * FROM Employee';
+    //    connection.query(query, (err, res) => {
+    //    if (err) throw err;
+    //    res.forEach(({ first_name, last_name, department, role}) =>{
+    //        console.log(`Employee : ${first_name}${last_name} department: ${department} role: ${role}`)
+    //     })
+    // }
+        
+  const allEmployees = () => {
+      const query = 'SELECT * FROM Employee';
+      connection.query(query, (err, res) => {
+          if (err) throw err;
+        res.forEach(({ first_name, last_name, department, roles}) => {
+            console.log(`Employee Name: ${first_name} ${last_name} || Department: ${department} || Role: ${roles}`)
+        })
+        initApp();
+      })
+    }
 }
+
+// const addEmployee = () => {
+//     const query = '';
+//     connection.query(query, (err, res) => {
+//         if (err) throw err;
+//      res.
+//     })
+// }
