@@ -1,10 +1,15 @@
+// TO DO:
+
+// Engineer is currently broken - figure out a way to write multiple without overwriting previous
+// manager works BUT will overwrite if you attempt to add more than 1 manager
+// figure out how to update employee roles
+// refactor
+
+
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-const { allowedNodeEnvironmentFlags } = require('process');
 const Employee = require("./lib/employee");
 const Engineer = require("./lib/engineer");
-const Finance = require("./lib/finance");
-const Legal = require("./lib/legal");
 const Manager = require("./lib/manager");
 
 const connection = mysql.createConnection({
@@ -45,6 +50,7 @@ initApp = () => {
                     'View all employee roles',
                     'Add employee',
                     'Add department',
+                    'Add role',
                     'Exit'
                 ]
             }
@@ -60,9 +66,9 @@ initApp = () => {
                 case 'Add department':
                     addDept();
                     break;
-                // case 'Add role':
-                //     addRole();
-                //     break;
+                case 'Add role':
+                    addRole();
+                    break;
                 // case 'Update information':
                 //     updateInfo();
                 //     break;
@@ -185,7 +191,7 @@ const createEng = () => {
             {
                 type: 'input',
                 name: 'manager',
-                message: 'Please enter managers ID (ENG = 7, MGMT = 5, LAW = 9, FIN = 3)',
+                message: 'Please enter managers ID (ENG = 7, MGMT = 5)',
             },
         ])
         .then((answers) => {
@@ -247,7 +253,7 @@ const createMgmt = () => {
             {
                 type: 'input',
                 name: 'manager',
-                message: 'Please enter managers ID (ENG = 7, MGMT = 5, LAW = 9, FIN = 3)',
+                message: 'Please enter managers ID (ENG = 7, MGMT = 5)',
             },
         ])
         .then((answers) => {
@@ -302,6 +308,45 @@ const addDept = () => {
                 'INSERT INTO Department SET ?', 
                 {
                     dept_name: answers.newDept,
+                },
+                (err) => {
+                    if (err) throw err;
+                }
+            )
+            console.log("department added successfully")
+            initApp()
+        })
+}
+
+
+// ====================================================
+// function to create ROLES, and add to DB
+// ====================================================
+const addRole = () => {
+    inquirer    
+        .prompt([
+            {
+                type: 'input',
+                name: 'newRole',
+                message: 'Please type the title of the Role you would like to add'
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Please enter the starting salary for this role'
+            },
+            {
+                type: 'input',
+                name: 'deptId',
+                message: 'Please enter a unique ID for this department (ENG = 1, MGMT = 3)'
+            },
+        ]).then((answers) => {
+            connection.query(
+                'INSERT INTO Roles SET ?', 
+                {
+                    title: answers.newRole,
+                    salary: answers.salary,
+                    department_id: answers.deptId,
                 },
                 (err) => {
                     if (err) throw err;
