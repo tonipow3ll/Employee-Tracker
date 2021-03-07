@@ -1,6 +1,5 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-const { allowedNodeEnvironmentFlags } = require('process');
 const Employee = require("./lib/employee");
 
 const connection = mysql.createConnection({
@@ -74,18 +73,37 @@ connection.connect((err) => {
     //        console.log(`Employee : ${first_name}${last_name} department: ${department} role: ${role}`)
     //     })
     // }
+
+    // ==========================
+    // function to view all EMPLOYEES
+    // ==========================
         
   const allEmployees = () => {
       const query = 'SELECT * FROM Employee';
       connection.query(query, (err, res) => {
           if (err) throw err;
-        res.forEach(({ first_name, last_name, department, roles}) => {
-            console.log(`Employee Name: ${first_name} ${last_name} || Department: ${department} || Role: ${roles}`)
+        res.forEach(({ id, first_name, last_name, role_id, manager_id}) => {
+            console.log(`Employee Name: ${first_name} ${last_name} || Employee ID: ${id} || Role ID: ${role_id} || Manager ID: ${manager_id}`)
         })
         initApp();
       })
     }
 }
+ // ==========================
+// function to view all DEPARTMENTS
+ // ==========================
+        
+const allDepts = () => {
+    const query = 'SELECT * FROM Department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+      res.forEach(({ id, dept_name}) => {
+          console.log(`Department ID: ${id} || Department Name: ${dept_name}`)
+      })
+      initApp();
+    })
+  }
+
 
 // const addEmployee = () => {
 //     const query = 'INSERT INTO Employee';
@@ -95,7 +113,7 @@ connection.connect((err) => {
     
 //     })
 // }
-
+let employeeOBJ = [];
 const addEmployee = () => {
     inquirer
       .prompt([
@@ -137,7 +155,10 @@ const addEmployee = () => {
         },
     ])
     .then((answers) => {
-        switch (answers.department) {
+        let inputAnswers = new Employee (answers.firstName, answers.lastName, answers.title, answers.salary, answers.manager, answers.department);
+        employeeOBJ.push(inputAnswers)
+        console.log(employeeOBJ)
+        switch (inputAnswers.department) {
             case 'Engineer':
                 addEng();
                 break;
@@ -158,8 +179,10 @@ const addEmployee = () => {
 }
 
 // functions for adding employees below
-const addEng = (answers) => {
-    const query = 'INSERT INTO Employee'(first_name, last_name, answers.department, answers.salary, answers.manager, answers.roles);
+const addEng = () => {
+    console.log("adding engineer!")
+    console.log(employeeOBJ)
+    const query = `INSERT INTO Employee (first_name, last_name, title, department, salary, manager, roles) VALUES ${employeeOBJ} `;
     connection.query(query, (err, res) => {
         if (err) throw err;
       res.console.log('employee added')
