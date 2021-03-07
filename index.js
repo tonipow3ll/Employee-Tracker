@@ -30,8 +30,6 @@ connection.connect((err) => {
 let employeeOBJ = {
     manager: [],
     engineer: [],
-    legal: [],
-    finance: [],
 };
 
 initApp = () => {
@@ -46,6 +44,7 @@ initApp = () => {
                     'View all departments',
                     'View all employee roles',
                     'Add employee',
+                    'Add department',
                     'Exit'
                 ]
             }
@@ -58,9 +57,9 @@ initApp = () => {
                 case 'Add employee':
                     addEmployee();
                     break;
-                // case 'Add department':
-                //     addDept();
-                //     break;
+                case 'Add department':
+                    addDept();
+                    break;
                 // case 'Add role':
                 //     addRole();
                 //     break;
@@ -141,8 +140,6 @@ const addEmployee = () => {
                 choices: [
                     'Engineer',
                     'Manager',
-                    'Finance',
-                    'Legal',
                     'Exit (changes will NOT be saved)'
                 ]
             }
@@ -155,12 +152,6 @@ const addEmployee = () => {
                 case 'Manager':
                     createMgmt();
                     break;
-                case 'Finance':
-                    createAcct();
-                    break;
-                case 'Legal':
-                    createLawyer();
-                    break;
                 case 'Exit (changes will NOT be saved)':
                 confirmExit();
                     break;
@@ -172,7 +163,7 @@ const addEmployee = () => {
 }
 
 // ====================================================
-// function to create ENGINEERS, and add to DB
+// functions to create ENGINEERS, and add to DB
 // ====================================================
 const createEng = () => {
     inquirer
@@ -200,7 +191,7 @@ const createEng = () => {
         .then((answers) => {
             let newEng = new Engineer(answers.firstName, answers.lastName, answers.salary, answers.manager)
             employeeOBJ.engineer.push(newEng)
-            // console.log(employeeOBJ)
+            // console.log(engineer)
             writeDB();
         })
     }
@@ -211,10 +202,10 @@ const createEng = () => {
     connection.query(
         'INSERT INTO Employee SET ?',
         {
-            first_name: employeeOBJ.engineer[0].firstName,
-            last_name: employeeOBJ.engineer[0].lastName,
+            first_name: employeeOBJ.engineer.firstName,
+            last_name: employeeOBJ.engineer.lastName,
             role_id: 5,
-            manager_id: employeeOBJ.engineer[0].manager
+            manager_id: employeeOBJ.engineer.manager
         }, 
         (err) => {
             if (err) throw err;
@@ -233,7 +224,7 @@ const writeDB = () => {
 }
 
 // ====================================================
-// function to create MANAGERS, and add to DB
+// functions to create MANAGERS, and add to DB
 // ====================================================
 
 const createMgmt = () => {
@@ -267,9 +258,8 @@ const createMgmt = () => {
         })
     }
 
-
  function addMgmt () {
-    console.log(employeeOBJ.engineer)
+    console.log(employeeOBJ.manager)
     connection.query(
         'INSERT INTO Employee SET ?',
         {
@@ -280,11 +270,12 @@ const createMgmt = () => {
         }, 
         (err) => {
             if (err) throw err;
-            console.log("great success")
         }
    )
     initApp();
 }
+
+
 
 const writemgmtDB = () => {
     let mgmtCollection = "";
@@ -293,6 +284,34 @@ const writemgmtDB = () => {
         })
         return mgmtCollection;
 }
+
+
+// ====================================================
+// function to create DEPARTMENTS, and add to DB
+// ====================================================
+const addDept = () => {
+    inquirer    
+        .prompt([
+            {
+                type: 'input',
+                name: 'newDept',
+                message: 'Please type the name of the department you would like to add'
+            }
+        ]).then((answers) => {
+            connection.query(
+                'INSERT INTO Department SET ?', 
+                {
+                    dept_name: answers.newDept,
+                },
+                (err) => {
+                    if (err) throw err;
+                }
+            )
+            console.log("department added successfully")
+            initApp()
+        })
+}
+
 
 // confirm exit prompt
 const confirmExit = () => {
