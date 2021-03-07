@@ -1,11 +1,9 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-const { allowedNodeEnvironmentFlags } = require('process');
 const Employee = require("./lib/employee");
 const Engineer = require("./lib/engineer");
 const Finance = require("./lib/finance");
 const Legal = require("./lib/legal");
-const Manager = require("./lib/manager");
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -26,14 +24,6 @@ connection.connect((err) => {
     initApp()
 });
 
-
-let employeeOBJ = {
-    manager: [],
-    engineer: [],
-    legal: [],
-    finance: [],
-};
-
 initApp = () => {
     inquirer
         .prompt([
@@ -46,6 +36,9 @@ initApp = () => {
                     'View all departments',
                     'View all employee roles',
                     'Add employee',
+                    'Add department',
+                    'Add role',
+                    'Update information',
                     'Exit'
                 ]
             }
@@ -58,15 +51,15 @@ initApp = () => {
                 case 'Add employee':
                     addEmployee();
                     break;
-                // case 'Add department':
-                //     addDept();
-                //     break;
-                // case 'Add role':
-                //     addRole();
-                //     break;
-                // case 'Update information':
-                //     updateInfo();
-                //     break;
+                case 'Add department':
+                    addDept();
+                    break;
+                case 'Add role':
+                    addRole();
+                    break;
+                case 'Update information':
+                    updateInfo();
+                    break;
                 case 'View all departments':
                     allDepts();
                     break;
@@ -78,7 +71,6 @@ initApp = () => {
                     break;
             }
         })
-    }
 
     // ==========================
     // function to view all EMPLOYEES
@@ -94,8 +86,7 @@ initApp = () => {
             initApp();
         })
     }
-
-
+}
 // ==========================
 // function to view all DEPARTMENTS
 // ==========================
@@ -110,7 +101,6 @@ const allDepts = () => {
         initApp();
     })
 }
-
 
 // ==========================
 // function to view all ROLES
@@ -131,170 +121,139 @@ const allRoles = () => {
     })
 }
 
+
+let employeeOBJ = {
+    employee: []
+};
 const addEmployee = () => {
     inquirer
         .prompt([
             {
+                type: 'input',
+                name: 'firstName',
+                message: 'Please enter employees first name',
+            },
+            {
+                type: 'input',
+                name: 'lastName',
+                message: 'Please enter employees last name',
+            },
+            {
+                type: 'input',
+                name: 'title',
+                message: 'Please enter employees title',
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Please enter employees salary',
+            },
+            {
+                type: 'input',
+                name: 'manager',
+                message: 'Please enter employees manager (hit enter to leave blank if n/a)',
+            },
+            {
                 type: 'list',
                 name: 'department',
-                message: 'What type of employee would you like to add?',
+                message: 'Please select a department',
                 choices: [
                     'Engineer',
                     'Manager',
                     'Finance',
-                    'Legal',
                     'Exit (changes will NOT be saved)'
                 ]
-            }
+            },
         ])
         .then((answers) => {
-            switch(answers.department){
+            let newEmp = new Employee(answers.firstName, answers.lastName, answers.title, answers.salary, answers.manager, answers.department);
+             employeeOBJ.employee.push(newEmp)
+            // employeeOBJ.forEach(employee.push(newEmp))
+            // console.log(employeeOBJ)
+            switch (newEmp.department) {
                 case 'Engineer':
-                    createEng();
+                    addEng();
                     break;
                 case 'Manager':
-                    createMgmt();
+                    addMgmt();
                     break;
                 case 'Finance':
-                    createAcct();
-                    break;
-                case 'Legal':
-                    createLawyer();
+                    addAcct();
                     break;
                 case 'Exit (changes will NOT be saved)':
-                confirmExit();
+                    confirmExit();
                     break;
-                default: 
+                default:
                     initApp();
                     break;
             }
         })
 }
 
-// ====================================================
-// function to create ENGINEERS, and add to DB
-// ====================================================
-const createEng = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'input',
-                name: 'firstName',
-                message: 'Please enter employees first name',
-            },
-           { type: 'input',
-            name: 'lastName',
-            message: 'Please enter employees last name',
-           },
-           {
-            type: 'input',
-            name: 'salary',
-            message: 'Please enter employees salary',
-            },
-            {
-                type: 'input',
-                name: 'manager',
-                message: 'Please enter managers ID (ENG = 7, MGMT = 5, LAW = 9, FIN = 3)',
-            },
-        ])
-        .then((answers) => {
-            let newEng = new Engineer(answers.firstName, answers.lastName, answers.salary, answers.manager)
-            employeeOBJ.engineer.push(newEng)
-            // console.log(employeeOBJ)
-            writeDB();
-        })
-    }
+// functions for adding employees below
+// const addEng = () => {
+//     console.log("adding engineer!")
+//     console.log(employeeOBJ.employee[0].lastName)
+//     const query = `INSERT INTO Employee (id, first_name, last_name, role_id, manager_id) VALUES ${employeeOBJ.employee[0].firstName}, ${employeeOBJ.employee[0].lastName}, 5, ${employeeOBJ.employee[0].manager}`;
+//     connection.query(query, (err, res) => {
+//         if (err) throw err;
+//         res.console.log('employee added')
+//     })
+//     initApp();
+// }
 
-
- function addEng () {
-    console.log(employeeOBJ.engineer)
+const addEng = () => {
     connection.query(
         'INSERT INTO Employee SET ?',
         {
-            first_name: employeeOBJ.engineer[0].firstName,
-            last_name: employeeOBJ.engineer[0].lastName,
+            first_name: employeeOBJ.employee[0].firstName,
+            last_name: employeeOBJ.employee[0].lastName,
             role_id: 5,
-            manager_id: employeeOBJ.engineer[0].manager
+            manager_id: employeeOBJ.employee[0].manager
         }, 
         (err) => {
             if (err) throw err;
             console.log("great success")
         }
-   )
+    )
     initApp();
 }
 
-const writeDB = () => {
-    let empCollection = "";
-    employeeOBJ.engineer.forEach(engineer => {
-        empCollection += addEng(engineer);
-        })
-        return empCollection;
-}
 
-// ====================================================
-// function to create MANAGERS, and add to DB
-// ====================================================
-
-const createMgmt = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'input',
-                name: 'firstName',
-                message: 'Please enter employees first name',
-            },
-           { type: 'input',
-            name: 'lastName',
-            message: 'Please enter employees last name',
-           },
-           {
-            type: 'input',
-            name: 'salary',
-            message: 'Please enter employees salary',
-            },
-            {
-                type: 'input',
-                name: 'manager',
-                message: 'Please enter managers ID (ENG = 7, MGMT = 5, LAW = 9, FIN = 3)',
-            },
-        ])
-        .then((answers) => {
-            let newMger = new Manager(answers.firstName, answers.lastName, answers.salary, answers.manager)
-            employeeOBJ.manager.push(newMger)
-            // console.log(employeeOBJ)
-            writemgmtDB();
-        })
-    }
-
-
- function addMgmt () {
-    console.log(employeeOBJ.engineer)
+const addMgmt = () => {
     connection.query(
         'INSERT INTO Employee SET ?',
         {
-            first_name: employeeOBJ.manager[0].firstName,
-            last_name: employeeOBJ.manager[0].lastName,
+            first_name: employeeOBJ.employee[0].firstName,
+            last_name: employeeOBJ.employee[0].lastName,
             role_id: 5,
-            manager_id: employeeOBJ.manager[0].manager
+            manager_id: employeeOBJ.employee[0].manager
         }, 
         (err) => {
             if (err) throw err;
             console.log("great success")
         }
-   )
+    )
     initApp();
 }
 
-const writemgmtDB = () => {
-    let mgmtCollection = "";
-    employeeOBJ.manager.forEach(manager => {
-        mgmtCollection += addMgmt(manager);
-        })
-        return mgmtCollection;
+const addAcct = () => {
+    connection.query(
+        'INSERT INTO Employee SET ?',
+        {
+            first_name: employeeOBJ.employee[0].firstName,
+            last_name: employeeOBJ.employee[0].lastName,
+            role_id: 5,
+            manager_id: employeeOBJ.employee[0].manager
+        }, 
+        (err) => {
+            if (err) throw err;
+            console.log("great success")
+        }
+    )
+    initApp();
 }
 
-// confirm exit prompt
 const confirmExit = () => {
     inquirer
         .prompt([
