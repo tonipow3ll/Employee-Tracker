@@ -48,6 +48,7 @@ initApp = () => {
                     'View all employees',
                     'View all departments',
                     'View all employee roles',
+                    'Update employee information',
                     'Add employee',
                     'Add department',
                     'Add role',
@@ -69,9 +70,9 @@ initApp = () => {
                 case 'Add role':
                     addRole();
                     break;
-                // case 'Update information':
-                //     updateInfo();
-                //     break;
+                case 'Update employee information':
+                    updateInfo();
+                    break;
                 case 'View all departments':
                     allDepts();
                     break;
@@ -357,6 +358,40 @@ const addRole = () => {
         })
 }
 
+// ====================================================
+// function to UPDATE Employee roles and edit DB
+// ====================================================
+
+const updateInfo = () => {
+    inquirer    
+     .prompt([
+         {
+             type: 'input',
+             name: 'firstName',
+             message: 'Enter the first name of the employee you would like to update'
+         },
+         {
+            type: 'input',
+            name: 'lastName',
+            message: 'Enter the last name of the employee you would like to update'
+        },
+        {
+            type: 'input',
+            name: 'newDept',
+            message: 'Enter employees new department ID (ENG = 1, MGMT = 3)'
+        },
+        {
+            type: 'input',
+            name: 'newId',
+            message: 'Enter employees new manager ID (ENG = 7, MGMT = 5)'
+        },
+     ]).then((answers) => {
+        connection.query(
+            `UPDATE Employee WHERE ${answers.firstName} ${answers.lastName} SET role_id = '${answers.newDept}' SET manager_id = '${answers.newId}'`
+        )
+     })
+    
+}
 
 // confirm exit prompt
 const confirmExit = () => {
