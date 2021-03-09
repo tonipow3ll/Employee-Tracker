@@ -111,7 +111,7 @@ const allDepts = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         res.forEach(({ id, dept_name }) => {
-            console.log(`Department ID: ${id} || Department Name: ${dept_name}`)
+            console.log(`Department Name: ${dept_name} || Department ID: ${id}`)
         })
         initApp();
     })
@@ -131,7 +131,7 @@ const allRoles = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         res.forEach(({ id, title, salary, department_id }) => {
-            console.log(`Employee ID: ${id} ||Title: ${title} || Salary: ${salary} || Department ID: ${department_id}`)
+            console.log(`Role: ${title} || Role ID: ${id} ||Salary: ${salary} || Department ID: ${department_id}`)
         })
         initApp();
     })
@@ -204,15 +204,15 @@ const createEng = () => {
     }
 
 
- function addEng () {
-    console.log(employeeOBJ.engineer)
+ function addEng (newEng) {
+    console.log(newEng)
     connection.query(
         'INSERT INTO Employee SET ?',
         {
-            first_name: employeeOBJ.engineer.firstName,
-            last_name: employeeOBJ.engineer.lastName,
+            first_name: newEng.firstName,
+            last_name: newEng.lastName,
             role_id: 5,
-            manager_id: employeeOBJ.engineer.manager
+            manager_id: newEng.manager
         }, 
         (err) => {
             if (err) throw err;
@@ -266,14 +266,14 @@ const createMgmt = () => {
     }
 
  function addMgmt () {
-    console.log(employeeOBJ.manager)
+    console.log(newMger)
     connection.query(
         'INSERT INTO Employee SET ?',
         {
-            first_name: employeeOBJ.manager[0].firstName,
-            last_name: employeeOBJ.manager[0].lastName,
+            first_name: newMger.firstName,
+            last_name: newMger.lastName,
             role_id: 5,
-            manager_id: employeeOBJ.manager[0].manager
+            manager_id: newMger.manager
         }, 
         (err) => {
             if (err) throw err;
@@ -387,7 +387,7 @@ const updateInfo = () => {
         },
      ]).then((answers) => {
         connection.query(
-            `UPDATE Employee WHERE ${answers.firstName} ${answers.lastName} SET role_id = '${answers.newDept}' SET manager_id = '${answers.newId}'`
+            `UPDATE Employee WHERE ${answers.firstName} ${answers.lastName} SET role_id = '${answers.newDept}' SET manager_id = '${answers.newId} at ?'`
         )
      })
     
