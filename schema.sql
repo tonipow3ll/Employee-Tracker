@@ -15,6 +15,7 @@ CREATE TABLE Employee (
   last_name VARCHAR(30) NULL,
   role_id INT NOT NULL,
   manager_id INT NOT NULL,
+  email VARCHAR(30) NULL,
    PRIMARY KEY (id)
 );
 
