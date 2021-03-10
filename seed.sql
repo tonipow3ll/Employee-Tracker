@@ -17,16 +17,16 @@ INSERT INTO Department (id, dept_name)
 VALUES (4, 'Legal');
 
 INSERT INTO Roles (id, title, salary, department_id)
-VALUES (1, 'Engineering', 100000, 7);
+VALUES (1, 'Engineer', 100000, 7);
 
 INSERT INTO Roles (id, title, salary, department_id)
-VALUES (2, 'Management', 125000, 3);
+VALUES (2, 'Manager', 125000, 3);
 
 INSERT INTO Roles (id, title, salary, department_id)
-VALUES (3, 'Finance', 80000, 12);
+VALUES (3, 'Accountant', 80000, 12);
 
 INSERT INTO Roles (id, title, salary, department_id)
-VALUES (4, 'Legal', 100000, 5);
+VALUES (4, 'Legal Rep', 100000, 5);
 
 
 INSERT INTO Employee (id, first_name, last_name, department_id, manager_id)
