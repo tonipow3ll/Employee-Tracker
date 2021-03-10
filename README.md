@@ -3,6 +3,8 @@
 ### A CLI Application that stores Employee information (name, title, salary, etc). Users can also update, delete, and add employees or change information via the CLI. 
 # ![ScreenShot](https://user-images.githubusercontent.com/72999798/110673123-6557c980-819e-11eb-9655-fef844407137.gif)
 
+## [View the walkthrough video here](https://drive.google.com/file/d/12P69lGxdnh4SjoBqS-ZvVYFF2htSps7S/view?usp=sharing)
+
 
 # Table of Contents
 ### [Installation](#Installation)
