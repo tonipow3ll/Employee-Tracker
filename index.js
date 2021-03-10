@@ -32,7 +32,6 @@ connection.connect((err) => {
 
 
 let employeeOBJ = {
-    manager: [],
     engineer: [],
 };
 
