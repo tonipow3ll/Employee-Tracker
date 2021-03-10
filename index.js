@@ -10,7 +10,6 @@ const inquirer = require('inquirer');
 const mysql = require('mysql');
 const Employee = require("./lib/employee");
 const Engineer = require("./lib/engineer");
-const Manager = require("./lib/manager");
 var Table = require('cli-table');
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -63,7 +62,7 @@ initApp = () => {
                     allEmployees();
                     break;
                 case 'Add employee':
-                    addEmployee();
+                    createEng();
                     break;
                 case 'Add department':
                     addDept();
@@ -95,14 +94,14 @@ initApp = () => {
 // ==============================
 
 const allEmployees = () => {
-    const query = 'SELECT Employee.first_name, Employee.last_name, Employee.department_id, Roles.salary FROM ROLES INNER JOIN Employee ON Roles.department_id = Employee.department_id';
+    const query = 'SELECT Employee.id, Employee.first_name, Employee.last_name, Employee.department_id, Roles.salary, Roles.title FROM ROLES INNER JOIN Employee ON Roles.department_id = Employee.department_id';
     connection.query(query, (err, res) => {
         if (err) throw err;
         let table = new Table({
-            head: ['First Name', 'Last Name', 'Department ID', 'Salary'],
+            head: ['id', 'First Name', 'Last Name', 'Department ID', 'Department', 'Salary'],
         });
-        let mappedArr = res.map(({ first_name, last_name, department_id, salary }) => {
-            return [first_name, last_name, department_id, salary]
+        let mappedArr = res.map(({ id, first_name, last_name, department_id, title, salary }) => {
+            return [id, first_name, last_name, department_id, title, salary]
         })
         table.push(...mappedArr)
         console.log(table.toString());
@@ -120,16 +119,13 @@ const allDepts = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         let table = new Table({
-            head: ['ID', 'Department Name'],
+            head: [ 'Department Name'],
         });
-        let mappedArr = res.map(({ id, dept_name }) => {
-            return [id, dept_name]
+        let mappedArr = res.map(({ dept_name }) => {
+            return [ dept_name]
         })
         table.push(...mappedArr)
         console.log(table.toString());
-        // res.forEach(({ id, dept_name }) => {
-        //     console.log(`Department Name: ${dept_name} || Department ID: ${id}`)
-        // })
         initApp();
     })
 }
@@ -147,57 +143,21 @@ const allRoles = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         let table = new Table({
-            head: ['ID', 'Title', 'Salary', 'Department ID'],
+            head: ['Title', 'Salary', 'Department ID'],
         });
-        let mappedArr = res.map(({ id, title, salary, department_id}) => {
-            return [id, title, salary, department_id]
+        let mappedArr = res.map(({ title, salary, department_id}) => {
+            return [ title, salary, department_id]
         })
         table.push(...mappedArr)
         console.log(table.toString());
-        // res.forEach(({ id, title, salary, department_id, first_name }) => {
-        //     console.log(`Role: ${title} || Role ID: ${id} ||Salary: ${salary} || Department ID: ${department_id}`)
-        // })
         initApp();
     })
 }
 
 
 
-
-const addEmployee = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'list',
-                name: 'department',
-                message: 'What type of employee would you like to add?',
-                choices: [
-                    'Engineer',
-                    'Manager',
-                    'Exit (changes will NOT be saved)'
-                ]
-            }
-        ])
-        .then((answers) => {
-            switch (answers.department) {
-                case 'Engineer':
-                    createEng();
-                    break;
-                case 'Manager':
-                    createMgmt();
-                    break;
-                case 'Exit (changes will NOT be saved)':
-                    connection.end(console.log("Exiting application, goodbye"));
-                    break;
-                default:
-                    initApp();
-                    break;
-            }
-        })
-}
-
 // ====================================================
-// functions to create ENGINEERS, and add to DB
+// functions to create EMPLOYEES, and add to DB
 // ====================================================
 const createEng = () => {
     inquirer
@@ -219,12 +179,17 @@ const createEng = () => {
             },
             {
                 type: 'input',
+                name: 'deptId',
+                message: 'Please enter employees department ID (Engineer - 7, Accountant - 12, Legal - 5)'
+            },
+            {
+                type: 'input',
                 name: 'manager',
-                message: 'Please enter employee managers ID (IF ENGINEER = 7 || IF MANAGER = 5)',
+                message: 'Please enter employee managers ID',
             },
         ])
         .then((answers) => {
-            let newEng = new Engineer(answers.firstName, answers.lastName, answers.salary, answers.manager)
+            let newEng = new Engineer(answers.firstName, answers.lastName, answers.salary, answers.deptId, answers.manager)
             employeeOBJ.engineer.push(newEng)
             // console.log(newEng)
             writeDB();
@@ -233,15 +198,13 @@ const createEng = () => {
 
 
 function addEng(newEng) {
-    // console.log(newEng)
     connection.query(
         'INSERT INTO Employee SET ?',
         {
             first_name: newEng.firstName,
             last_name: newEng.lastName,
-            department_id: 5,
+            department_id: newEng.department,
             manager_id: newEng.manager,
-            // email: newEng.email,
         },
         (err) => {
             if (err) throw err;
@@ -259,67 +222,6 @@ const writeDB = () => {
     return empCollection;
 }
 
-// ====================================================
-// functions to create MANAGERS, and add to DB
-// ====================================================
-
-const createMgmt = () => {
-    inquirer
-        .prompt([
-            {
-                type: 'input',
-                name: 'firstName',
-                message: 'Please enter employees first name',
-            },
-            {
-                type: 'input',
-                name: 'lastName',
-                message: 'Please enter employees last name',
-            },
-            {
-                type: 'input',
-                name: 'salary',
-                message: 'Please enter employees salary',
-            },
-            {
-                type: 'input',
-                name: 'manager',
-                message: 'Please enter managers ID (IF ENGINEER = 7 || IF MANAGER = 5)',
-            },
-        ])
-        .then((answers) => {
-            let newMger = new Manager(answers.firstName, answers.lastName, answers.salary, answers.manager)
-            employeeOBJ.manager.push(newMger)
-            // console.log(employeeOBJ)
-            writemgmtDB();
-        })
-}
-
-function addMgmt(newMger) {
-    console.log(newMger)
-    connection.query(
-        'INSERT INTO Employee SET ?',
-        {
-            first_name: newMger.firstName,
-            last_name: newMger.lastName,
-            department_id: 5,
-            manager_id: newMger.manager,
-            // email: newMger.email,
-        },
-        (err) => {
-            if (err) throw err;
-        }
-    )
-    initApp();
-}
-
-const writemgmtDB = () => {
-    let mgmtCollection = "";
-    employeeOBJ.manager.forEach(manager => {
-        mgmtCollection + addMgmt(manager);
-    })
-    return mgmtCollection;
-}
 
 
 // ====================================================
@@ -402,7 +304,7 @@ const updateInfo = () => {
             {
                 type: 'input',
                 name: 'newDept',
-                message: 'Enter employees new department ID'
+                message: 'Enter employees new department ID (Engineer - 7, Accountant - 12, Legal - 5)'
             },
             {
                 type: 'input',
@@ -426,17 +328,18 @@ const deleteInfo = () => {
         .prompt([
             {
                 type: 'input',
-                name: 'firstName',
-                message: 'Enter the first name of the employee you would like to delete from the database'
+                name: 'empId',
+                message: 'Enter the Employees unique ID that you would like to delete from the database'
             }
         ])
         .then((answers) => {
-            const query = `DELETE FROM Employee WHERE first_name='${answers.firstName}'`
-            connection.query(query,
+            connection.query(`DELETE FROM Employee WHERE id='${answers.empId}'`,
                 (err, res) => {
+                    if(err) throw err;
+                    console.log(`${answers.empId} Does not exist.`)
                 }
             )
-            console.log('Employee deleted')
+            console.log(`Employee deleted`)
             initApp()
         })
 }
