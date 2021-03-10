@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/tonipow3ll/Employee-Tracker#readme",
   "dependencies": {
+    "cli-table": "^0.3.5",
     "inquirer": "^8.0.0",
     "mysql": "^2.18.1"
   }
