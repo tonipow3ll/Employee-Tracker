@@ -1,8 +1,7 @@
 // TO DO:
 
-// figure out how to update employee roles - function is broken
-// delete func
-// update seed file
+// add functionality to see entire budget / spend sum on salarys?
+// view employees by manager ID ??
 // refactor
 
 
@@ -11,6 +10,7 @@ const mysql = require('mysql');
 const Employee = require("./lib/employee");
 const Engineer = require("./lib/engineer");
 var Table = require('cli-table');
+require('dotenv').config();
 const connection = mysql.createConnection({
     host: 'localhost',
 
@@ -24,6 +24,7 @@ const connection = mysql.createConnection({
     password: 'Bonniethedog',
     database: 'EmployeeTracker_DB',
 });
+
 
 connection.connect((err) => {
     if (err) throw err;
