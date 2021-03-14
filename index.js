@@ -208,7 +208,7 @@ function addEng(newEng) {
         },
         (err) => {
             if (err) throw err;
-            console.log("great success")
+            console.log("ruh roh, something went wrong")
         }
     )
     initApp();
