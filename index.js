@@ -1,10 +1,3 @@
-// TO DO:
-
-// add functionality to see entire budget / spend sum on salarys?
-// view employees by manager ID ??
-// refactor
-
-
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const Employee = require("./lib/employee");
@@ -87,8 +80,7 @@ initApp = () => {
                     break;
             }
         })
-}
-
+};
 // =============================
 // function to view all EMPLOYEES
 // ==============================
@@ -108,7 +100,7 @@ const allEmployees = () => {
 
         initApp();
     })
-}
+};
 
 // ==========================
 // function to view all DEPARTMENTS
@@ -119,16 +111,16 @@ const allDepts = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         let table = new Table({
-            head: [ 'Department Name'],
+            head: ['Department Name'],
         });
         let mappedArr = res.map(({ dept_name }) => {
-            return [ dept_name]
+            return [dept_name]
         })
         table.push(...mappedArr)
         console.log(table.toString());
         initApp();
     })
-}
+};
 
 
 // ==========================
@@ -139,20 +131,19 @@ const allDepts = () => {
 const allRoles = () => {
     const query = `SELECT Roles.id, Roles.title, Roles.salary, Roles.department_id
     FROM Roles`;
-    // FROM Roles INNER JOIN Employee ON Employee.id = Roles.id
     connection.query(query, (err, res) => {
         if (err) throw err;
         let table = new Table({
             head: ['Title', 'Salary', 'Department ID'],
         });
-        let mappedArr = res.map(({ title, salary, department_id}) => {
-            return [ title, salary, department_id]
+        let mappedArr = res.map(({ title, salary, department_id }) => {
+            return [title, salary, department_id]
         })
         table.push(...mappedArr)
         console.log(table.toString());
         initApp();
     })
-}
+};
 
 
 
@@ -191,10 +182,9 @@ const createEng = () => {
         .then((answers) => {
             let newEng = new Engineer(answers.firstName, answers.lastName, answers.salary, answers.deptId, answers.manager)
             employeeOBJ.engineer.push(newEng)
-            // console.log(newEng)
             writeDB();
         })
-}
+};
 
 
 function addEng(newEng) {
@@ -220,7 +210,7 @@ const writeDB = () => {
         empCollection + addEng(engineer);
     })
     return empCollection;
-}
+};
 
 
 
@@ -335,7 +325,7 @@ const deleteInfo = () => {
         .then((answers) => {
             connection.query(`DELETE FROM Employee WHERE id='${answers.empId}'`,
                 (err, res) => {
-                    if(err) throw err;
+                    if (err) throw err;
                     console.log(`${answers.empId} Does not exist.`)
                 }
             )
